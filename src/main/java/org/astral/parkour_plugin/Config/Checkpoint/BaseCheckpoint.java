@@ -19,7 +19,7 @@ public class BaseCheckpoint {
     // FOLDERS & FILES
     private final String MAPS = Configuration.MAPS;
     private final String MAP_FOLDER;
-    protected final String CHECKPOINT = Configuration.CHECKPOINT;
+    protected static final String CHECKPOINT = Configuration.CHECKPOINT;
 
     // Configuration
     protected YamlConfiguration yamlConfiguration;
