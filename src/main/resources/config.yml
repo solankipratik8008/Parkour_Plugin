@@ -1,0 +1,7 @@
+EDIT_MODE:
+  Break_Bocks: false
+  Copy_Blocks: false
+  Floating_Blocks: true
+  Distance_Block_Air: 5
+  Commands: true
+

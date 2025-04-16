@@ -1,0 +1,16 @@
+name: Parkour_Plugin
+version: '${version}'
+main: org.astral.parkour_plugin.Main
+api-version: "1.13"
+folia-supported: true
+authors:
+  - duk3l0
+  - 4str4l
+
+softdepend: [ProtocolLib, PlaceholderAPI, Multiverse-Core]
+
+commands:
+  Parkour:
+    description: "Comando principal del plugin de parkour"
+    usage: /parkour
+    aliases: [pk]
