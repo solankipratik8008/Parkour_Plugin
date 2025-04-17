@@ -2,11 +2,17 @@ package org.astral.parkour_plugin.Config.Checkpoint;
 
 import org.astral.parkour_plugin.Config.Configuration;
 import org.astral.parkour_plugin.Main;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Rules {
     // Instances
@@ -31,8 +37,37 @@ public final class Rules {
         }
     }
 
-    public void setSpawn(final Location location){
+    public @NotNull List<Location> getLocations() {
+        final List<Location> positions = new ArrayList<>();
+        final ConfigurationSection spawnsSection = yamlConfiguration.getConfigurationSection("spawns");
+        if (spawnsSection == null) return positions;
+        for (String key : spawnsSection.getKeys(false)) {
+            final ConfigurationSection positionSection = spawnsSection.getConfigurationSection(key);
+            if (positionSection == null) continue;
+            final String worldName = positionSection.getString("world");
+            final World world = Bukkit.getWorld(worldName);
+            if (world == null) continue;
+            double x = positionSection.getDouble("x");
+            double y = positionSection.getDouble("y");
+            double z = positionSection.getDouble("z");
+            positions.add(new Location(world, x, y, z));
+        }
+        return positions;
+    }
 
+    public void setSpawns(final @NotNull List<Location> positions) {
+        final ConfigurationSection spawnsSection = yamlConfiguration.createSection("spawns");
+        for (int i = 0; i < positions.size(); i++) {
+            final Location loc = positions.get(i);
+            final double x = Math.floor(loc.getX()) + 0.5;
+            final double y = Math.floor(loc.getY());
+            final double z = Math.floor(loc.getZ()) + 0.5;
+            final ConfigurationSection positionSection = spawnsSection.createSection("position_" + i);
+            positionSection.set("world", loc.getWorld().getName());
+            positionSection.set("x", x);
+            positionSection.set("y", y);
+            positionSection.set("z", z);
+        }
     }
 
     private void saveConfiguration() {

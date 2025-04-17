@@ -64,14 +64,19 @@ public final class CheckpointConfig extends BaseCheckpoint {
     public @NotNull List<Location> getLocations() {
         validateConfigurationSection();
         final List<Location> positions = new ArrayList<>();
-        final World world = Bukkit.getWorld(Objects.requireNonNull(configurationSection.getString("world")));
-        for (final String key : configurationSection.getKeys(false)) {
-            if (key.startsWith("position_")) {
-                final double x = configurationSection.getDouble(key + ".x");
-                final double y = configurationSection.getDouble(key + ".y");
-                final double z = configurationSection.getDouble(key + ".z");
-                positions.add(new Location(world, x, y, z));
-            }
+        final ConfigurationSection locationsSection = configurationSection.getConfigurationSection("locations");
+        if (locationsSection == null) return positions;
+        for (String key : locationsSection.getKeys(false)) {
+            final ConfigurationSection posSection = locationsSection.getConfigurationSection(key);
+            if (posSection == null) continue;
+            final String worldName = posSection.getString("world");
+            final World world = Bukkit.getWorld(worldName);
+            if (world == null) continue;
+            double x = posSection.getDouble("x");
+            double y = posSection.getDouble("y");
+            double z = posSection.getDouble("z");
+
+            positions.add(new Location(world, x, y, z));
         }
         return positions;
     }
@@ -125,16 +130,18 @@ public final class CheckpointConfig extends BaseCheckpoint {
 
     public void setLocations(final @NotNull List<Location> positions) {
         validateConfigurationSection();
-
+        configurationSection.set("locations", null);
+        final ConfigurationSection locationsSection = configurationSection.createSection("locations");
         for (int i = 0; i < positions.size(); i++) {
             final Location loc = positions.get(i);
             final double x = Math.floor(loc.getX()) + 0.5;
             final double y = Math.floor(loc.getY());
             final double z = Math.floor(loc.getZ()) + 0.5;
-            configurationSection.set("world", loc.getWorld().getName());
-            configurationSection.set("position_" + i + ".x", x);
-            configurationSection.set("position_" + i + ".y", y);
-            configurationSection.set("position_" + i + ".z", z);
+            final ConfigurationSection posSection = locationsSection.createSection("position_" + i);
+            posSection.set("world", loc.getWorld().getName());
+            posSection.set("x", x);
+            posSection.set("y", y);
+            posSection.set("z", z);
         }
         saveConfiguration();
     }
