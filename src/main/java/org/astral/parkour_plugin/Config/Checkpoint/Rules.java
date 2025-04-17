@@ -55,6 +55,24 @@ public final class Rules {
         return positions;
     }
 
+    public @NotNull List<Location> getEndPoints() {
+        final List<Location> positions = new ArrayList<>();
+        final ConfigurationSection finishSection = yamlConfiguration.getConfigurationSection("finish");
+        if (finishSection == null) return positions;
+        for (String key : finishSection.getKeys(false)) {
+            final ConfigurationSection positionSection = finishSection.getConfigurationSection(key);
+            if (positionSection == null) continue;
+            final String worldName = positionSection.getString("world");
+            final World world = Bukkit.getWorld(worldName);
+            if (world == null) continue;
+            final double x = positionSection.getDouble("x");
+            final double y = positionSection.getDouble("y");
+            final double z = positionSection.getDouble("z");
+            positions.add(new Location(world, x, y, z));
+        }
+        return positions;
+    }
+
     public void setSpawns(final @NotNull List<Location> positions) {
         final ConfigurationSection spawnsSection = yamlConfiguration.createSection("spawns");
         for (int i = 0; i < positions.size(); i++) {
@@ -68,8 +86,25 @@ public final class Rules {
             positionSection.set("y", y);
             positionSection.set("z", z);
         }
+        saveConfiguration();
     }
 
+    public void setEndPoints(@NotNull List<Location> positions) {
+        final ConfigurationSection finishSection = yamlConfiguration.createSection("finish");
+        for (int i = 0; i < positions.size(); i++) {
+            final Location loc = positions.get(i);
+            final double x = Math.floor(loc.getX()) + 0.5;
+            final double y = Math.floor(loc.getY());
+            final double z = Math.floor(loc.getZ()) + 0.5;
+
+            final ConfigurationSection positionSection = finishSection.createSection("position_" + i);
+            positionSection.set("world", loc.getWorld().getName());
+            positionSection.set("x", x);
+            positionSection.set("y", y);
+            positionSection.set("z", z);
+        }
+        saveConfiguration();
+    }
     private void saveConfiguration() {
         try {
             configuration.saveConfiguration(yamlConfiguration, MAPS, MAP_FOLDER ,RULES);
