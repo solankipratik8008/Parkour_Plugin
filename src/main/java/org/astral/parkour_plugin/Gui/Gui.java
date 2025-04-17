@@ -82,7 +82,7 @@ public final class Gui {
             final ItemStack[] itemStacks = player.getInventory().getContents();
             playerInventories.put(player, itemStacks);
             InventoryCache.saveInventory(uuid, itemStacks);
-            loadMainInventory(player);
+            loadEditInventoryMap(player);
             editingPlayers.put(player, true);
             SoundApi.playSound(player, 1.0f, 2.0f, "ORB_PICKUP","ENTITY_EXPERIENCE_ORB_PICKUP");
         }
@@ -94,7 +94,7 @@ public final class Gui {
         }
     }
 
-    public static void loadMainInventory(final @NotNull Player player){
+    public static void loadMainInventory(final @NotNull Player player) {
         menu.put(player, main_Menu);
         player.getInventory().clear();
         player.getInventory().setItem(0, Tools.ADD_MAP_ITEM.getItem());
@@ -105,9 +105,9 @@ public final class Gui {
 
     ////----------------------------------------------------------------------------[CHECKPOINT]
     ////----------------------------------------------------------------------------------------
-    public static void loadCheckpointMap(final @NotNull Player player, final String name_map){
+    public static void loadCheckpointMap(final @NotNull Player player){
         menu.put(player, checkpoint_menu);
-        mapPlayer.put(player, name_map);
+        final String name_map = mapPlayer.getOrDefault(player, "");
         playerPages.put(player, 0);
         DynamicTools.loadCheckpointsItems(name_map);
         player.getInventory().clear();
@@ -229,6 +229,9 @@ public final class Gui {
 
     ////------------------------------------------------------------------------------------[Gui]
     ////----------------------------------------------------------------------------------------
+    public static void setMapPlayer(final Player player, final String name_map){
+        mapPlayer.put(player, name_map);
+    }
 
     public static void Mark_Spawns(final @NotNull Player player){
 
@@ -299,7 +302,7 @@ public final class Gui {
 
     }
 
-    public static void editCheckpoints(final @NotNull Player player){
+    public static void loadEditInventoryMap(final @NotNull Player player){
         menu.put(player, checkpoint_Menu_Edit);
         player.getInventory().clear();
         player.getInventory().setItem(0, Tools.CHANGE_ITEM_POSITION.getItem());
@@ -561,12 +564,12 @@ public final class Gui {
 
         switch (menu_player) {
             case checkpoint_Menu_Edit:
-                if (name_map != null) loadCheckpointMap(player, name_map);
-                break;
-            case checkpoint_menu:
                 if (name_map != null) HOLOGRAM_API.hideHolograms(player, name_map);
                 mapPlayer.remove(player);
                 loadMainInventory(player);
+                break;
+            case checkpoint_menu:
+                if (name_map != null) loadEditInventoryMap(player);
                 break;
             default:
                 player.sendMessage("Valor inesperado para menu_player: " + menu_player);

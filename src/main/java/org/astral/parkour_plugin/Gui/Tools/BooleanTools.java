@@ -17,7 +17,8 @@ public enum BooleanTools {
 
     DESTROY_BLOCKS_EDIT_MODE(Config.romperBloques, Config.getBreakBlocksEditMode(), 0, 0),
     COPY_BLOCKS_EDIT_MODE(Config.copiarBloque, Config.getCopyBlocks(), 0, 0),
-    SET_FLOATING_BLOCKS(Config.bloquesFlotantes, Config.getFloatingBlocks(), 0, 0)
+    SET_FLOATING_BLOCKS(Config.bloquesFlotantes, Config.getFloatingBlocks(), 0, 0),
+
     ;
 
     private final String name;

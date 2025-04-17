@@ -105,11 +105,13 @@ public final class GuiListener implements Listener {
             if (item.isSimilar(Tools.PREVIOUS_PAGE_ITEM.getItem()))
                 Gui.previousPages(player);
 
-            if (isDynamicToolMaps(item))
-                Gui.loadCheckpointMap(player, DynamicTools.getName(item));
+            if (isDynamicToolMaps(item)) {
+                Gui.setMapPlayer(player, DynamicTools.getName(item));
+                Gui.loadEditInventoryMap(player);
+            }
 
             if (item.isSimilar(Tools.EDIT_FEATHER_ITEM.getItem()))
-                Gui.editCheckpoints(player);
+                Gui.loadEditInventoryMap(player);
 
             if (item.isSimilar(Tools.CHANGE_ITEM_POSITION.getItem()))
                 Gui.changeItems(player);
@@ -291,7 +293,6 @@ public final class GuiListener implements Listener {
             Gui.exitEditMode(player);
         }
     }
-
 
     @EventHandler
     public void onCommand(final @NotNull PlayerCommandPreprocessEvent event) {

@@ -60,7 +60,16 @@ public enum Tools {
     SPAWN_AND_FINISH_ITEM(Material.BLAZE_ROD, ChatColor.YELLOW + "",
             Arrays.asList(
                     ChatColor.AQUA + "Click izquierdo para marcar el inicio y spawn",
-                    ChatColor.GREEN + "Click derecho para marcar el final"));
+                    ChatColor.GREEN + "Click derecho para marcar el final")),
+
+
+    ONE_CHECKPOINT_MENU(Material.STICK, ChatColor.WHITE + "Menu de Checkpoints", Collections.singletonList(
+            ChatColor.AQUA + "Establece un Checkpoint")),
+
+    LIST_CHECKPOINT_MENU(Material.STICK, ChatColor.LIGHT_PURPLE + "Menu de Varios Checkpoints en uno",
+            Collections.singletonList(
+                    ChatColor.AQUA + "Establece varios checkpoints como uno"))
+    ;
 
     private final ItemStack item;
 

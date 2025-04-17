@@ -26,6 +26,7 @@ public final class Config {
     public static final String bloquesFlotantes = "Bloques Flotantes al Interactuar";
     public static final String distaciaBloqueAire = "Distancia del bloque";
 
+
     //Paths
     private final static String base = "EDIT_MODE.";
     private final static String break_blocks = base+"Break_Bocks";
