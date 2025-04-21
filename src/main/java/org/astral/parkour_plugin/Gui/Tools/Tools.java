@@ -57,18 +57,18 @@ public enum Tools {
 
     OPEN_INVENTORY_ITEM(Material.BEACON, ChatColor.GREEN + "Opciones Generales", null),
 
-    SPAWN_AND_FINISH_ITEM(Material.BLAZE_ROD, ChatColor.YELLOW + "",
-            Arrays.asList(
-                    ChatColor.AQUA + "Click izquierdo para marcar el inicio y spawn",
-                    ChatColor.GREEN + "Click derecho para marcar el final")),
+    SPAWN_AND_FINISH_MENU(Material.BLAZE_ROD, ChatColor.GOLD+ "Editor de Spawns y Finalizacion",
+            Collections.singletonList(ChatColor.YELLOW + "Establece el spawn de los jugadores y su meta final")),
 
-
-    ONE_CHECKPOINT_MENU(Material.STICK, ChatColor.WHITE + "Menu de Checkpoints", Collections.singletonList(
-            ChatColor.AQUA + "Establece un Checkpoint")),
+    ONE_CHECKPOINT_MENU(Material.STICK, ChatColor.WHITE + "Menu de Checkpoints",
+            Collections.singletonList(ChatColor.AQUA + "Establece un Checkpoint")),
 
     LIST_CHECKPOINT_MENU(Material.STICK, ChatColor.LIGHT_PURPLE + "Menu de Varios Checkpoints en uno",
-            Collections.singletonList(
-                    ChatColor.AQUA + "Establece varios checkpoints como uno"))
+            Collections.singletonList(ChatColor.AQUA + "Establece varios checkpoints como uno")),
+
+    MARK_SPAWN_ITEM(Material.BLAZE_ROD, ChatColor.GOLD+"Marca el Spawn de los jugadores", null),
+
+    MARK_FINISH_ITEM(Material.BLAZE_ROD, ChatColor.WHITE+"Marca la meta final", null),
     ;
 
     private final ItemStack item;

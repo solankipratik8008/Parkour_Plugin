@@ -1,8 +1,10 @@
 package org.astral.parkour_plugin.Gui.Tools;
 
 import org.astral.parkour_plugin.Config.Checkpoint.CheckpointConfig;
+import org.astral.parkour_plugin.Config.Checkpoint.Rules;
 import org.astral.parkour_plugin.Config.Configuration;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -18,8 +20,12 @@ import java.util.stream.Collectors;
 
 
 public final class DynamicTools {
+
     public static final List<ItemStack> SELECTS_MAPS_ITEMS = new ArrayList<>();
     public static final Map<String, List<ItemStack>> CHECKPOINTS_MAPS_ITEMS = new HashMap<>();
+    public static final Map<String, List<ItemStack>> SPAWN_LOCATIONS = new HashMap<>();
+    public static final Map<String, List<ItemStack>> FINISH_LOCATION = new HashMap<>();
+
     private static final Map<Player, ItemStack> uniquePlayerItem = new HashMap<>();
 
     static {
@@ -53,6 +59,36 @@ public final class DynamicTools {
         }
         mapItem.setItemMeta(mapItemMeta);
         return mapItem;
+    }
+
+    public static void loadSpawnPoints(final String name) {
+        SPAWN_LOCATIONS.computeIfAbsent(name, k->new ArrayList<>());
+        SPAWN_LOCATIONS.clear();
+        final Rules rules = new Rules(name);
+        for (final Location location : rules.getSpawnsLocations()){
+            final ItemStack spawnLocationItem = new ItemStack(Material.TRIPWIRE_HOOK);
+            final ItemMeta spawnMeta = spawnLocationItem.getItemMeta();
+            if (spawnMeta != null) {
+                spawnMeta.setDisplayName(ChatColor.AQUA + "Punto de Aparicion Establecido" +location.getWorld());
+                spawnMeta.setLore(Collections.singletonList(ChatColor.GREEN + "x:"+ location.getX() + " y: " + location.getY() + " z: " + location.getZ()));
+            }
+            SPAWN_LOCATIONS.get(name).add(spawnLocationItem);
+        }
+    }
+
+    public static void loadFinishPoints(final String name) {
+        FINISH_LOCATION.computeIfAbsent(name, k->new ArrayList<>());
+        FINISH_LOCATION.clear();
+        final Rules rules = new Rules(name);
+        for (final Location location : rules.getSpawnsLocations()){
+            final ItemStack spawnLocationItem = new ItemStack(Material.TRIPWIRE_HOOK);
+            final ItemMeta spawnMeta = spawnLocationItem.getItemMeta();
+            if (spawnMeta != null) {
+                spawnMeta.setDisplayName(ChatColor.AQUA + "Punto Final: " +location.getWorld());
+                spawnMeta.setLore(Collections.singletonList(ChatColor.GREEN + "x:"+ location.getX() + " y: " + location.getY() + " z: " + location.getZ()));
+            }
+            FINISH_LOCATION.get(name).add(spawnLocationItem);
+        }
     }
 
     public static void loadCheckpointsItems(final String name) {

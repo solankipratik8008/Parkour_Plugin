@@ -7,6 +7,7 @@ import org.astral.parkour_plugin.Config.Cache.BlockCache;
 import org.astral.parkour_plugin.Config.Cache.EntityCache;
 import org.astral.parkour_plugin.Config.Cache.InventoryCache;
 import org.astral.parkour_plugin.Config.Checkpoint.CheckpointConfig;
+import org.astral.parkour_plugin.Config.Checkpoint.Rules;
 import org.astral.parkour_plugin.Config.Configuration;
 import org.astral.parkour_plugin.Gui.Tools.BooleanTools;
 import org.astral.parkour_plugin.Gui.Tools.DynamicTools;
@@ -46,9 +47,12 @@ public final class Gui {
     private static final byte ITEMS_PER_PAGE_MAPS = 5;
 
     // CHECKPOINTS
-
     private static final byte INDEX_CHECKPOINT = 3;
     private static final byte ITEMS_PER_PAGE_CHECKPOINT = 3;
+
+    //Spawn & Finish
+    private static final byte INDEX_SPAWN = 4;
+    private static final byte ITEMS_PER_PAGE_SPAWN = 1;
 
     ////----------------------------------------------------------------------------[Names Inventories]
     ////-----------------------------------------------------------------------------------------------
@@ -60,6 +64,7 @@ public final class Gui {
     private static final String main_Menu = "Main_Menu";
     private static final String checkpoint_menu = "Checkpoint_Menu";
     private static final String checkpoint_Menu_Edit = "Checkpoint_Menu_Edit";
+    private static final String spawnAndFinishMenu = "Spawn_Menu";
 
     private static final Map<Player, ItemStack[]> playerInventories = new HashMap<>();
     private static final Map<Player, Boolean> editingPlayers = new HashMap<>();
@@ -82,7 +87,7 @@ public final class Gui {
             final ItemStack[] itemStacks = player.getInventory().getContents();
             playerInventories.put(player, itemStacks);
             InventoryCache.saveInventory(uuid, itemStacks);
-            loadEditInventoryMap(player);
+            loadMainInventory(player);
             editingPlayers.put(player, true);
             SoundApi.playSound(player, 1.0f, 2.0f, "ORB_PICKUP","ENTITY_EXPERIENCE_ORB_PICKUP");
         }
@@ -103,13 +108,24 @@ public final class Gui {
         showPage(player, 0, DynamicTools.SELECTS_MAPS_ITEMS,INDEX_MAPS, ITEMS_PER_PAGE_MAPS);
     }
 
+    ////----------------------------------------------------------------------[SPAWN AND FINISH]
+    ////----------------------------------------------------------------------------------------
+    public static void loadSpawnMenu(final @NotNull Player player){
+        menu.put(player, spawnAndFinishMenu);
+        final String name_map = mapPlayer.getOrDefault(player, "");
+        player.getInventory().clear();
+        player.getInventory().setItem(0, Tools.MARK_SPAWN_ITEM.getItem());
+        player.getInventory().setItem(1, Tools.MARK_FINISH_ITEM.getItem());
+        playerPages.put(player, 0);
+        showPage(player, 0, DynamicTools.SPAWN_LOCATIONS.get(name_map), INDEX_SPAWN, ITEMS_PER_PAGE_SPAWN);
+    }
+
     ////----------------------------------------------------------------------------[CHECKPOINT]
     ////----------------------------------------------------------------------------------------
-    public static void loadCheckpointMap(final @NotNull Player player){
+    public static void loadOneCheckpointMap(final @NotNull Player player){
         menu.put(player, checkpoint_menu);
         final String name_map = mapPlayer.getOrDefault(player, "");
         playerPages.put(player, 0);
-        DynamicTools.loadCheckpointsItems(name_map);
         player.getInventory().clear();
         showPage(player, 0, DynamicTools.CHECKPOINTS_MAPS_ITEMS.get(name_map), INDEX_CHECKPOINT, ITEMS_PER_PAGE_CHECKPOINT);
         player.getInventory().setItem(0, Tools.CHECKPOINT_MARKER.getItem());
@@ -117,7 +133,6 @@ public final class Gui {
         player.getInventory().setItem(7 , Tools.EDIT_FEATHER_ITEM.getItem());
         player.getInventory().setItem(8 , Tools.BACK_ITEM.getItem());
         player.getInventory().setItem(35, Tools.REMOVE_MAP.getItem());
-        HOLOGRAM_API.showHolograms(player, name_map);
         SoundApi.playSound(player, 1.0f, 1.0f, "CLICK", "UI_BUTTON_CLICK");
     }
 
@@ -133,6 +148,16 @@ public final class Gui {
         if (name_map.isEmpty()) return;
         Configuration.deleteMapFolder(name_map);
         removeMaps(name_map);
+    }
+
+    public static void addSpawnPoint(final Player player, final Location location) {
+        final String name_map = mapPlayer.get(player);
+        Rules rules = new Rules(name_map);
+        if (rules.isEqualsLocation(location)){
+            player.sendMessage("Esta ubicacion ya se marco como spawn");
+            return;
+        }
+
     }
 
     public static void addCheckpoint(final Player player, final Location location){
@@ -304,17 +329,22 @@ public final class Gui {
 
     public static void loadEditInventoryMap(final @NotNull Player player){
         menu.put(player, checkpoint_Menu_Edit);
+        final String name_map = mapPlayer.getOrDefault(player, "");
+        DynamicTools.loadCheckpointsItems(name_map);
         player.getInventory().clear();
-        player.getInventory().setItem(0, Tools.CHANGE_ITEM_POSITION.getItem());
-        final int v = 1;
+        player.getInventory().setItem(0, Tools.ONE_CHECKPOINT_MENU.getItem());
+        player.getInventory().setItem(1, Tools.LIST_CHECKPOINT_MENU.getItem());
+        player.getInventory().setItem(2, Tools.SPAWN_AND_FINISH_MENU.getItem());
+        player.getInventory().setItem(3, Tools.CHANGE_ITEM_POSITION.getItem());
+        player.getInventory().setItem(6, Tools.REMOVE_MAP.getItem());
+        player.getInventory().setItem(7, Tools.OPEN_INVENTORY_ITEM.getItem());
+        player.getInventory().setItem(8, Tools.BACK_ITEM.getItem());
+
+        final int v = 27;
         if (StateTools.DISTANCE_BLOCK.getSlot() != v) StateTools.DISTANCE_BLOCK.setSlot(v);
         if (BooleanTools.SET_FLOATING_BLOCKS.getToggle()) {
             StateTools.DISTANCE_BLOCK.setItemSlot(player.getInventory());
         }
-        player.getInventory().setItem(2, Tools.SPAWN_AND_FINISH_ITEM.getItem());
-        player.getInventory().setItem(7, Tools.OPEN_INVENTORY_ITEM.getItem());
-        player.getInventory().setItem(8, Tools.BACK_ITEM.getItem());
-        player.getInventory().setItem(35, Tools.REMOVE_MAP.getItem());
         SoundApi.playSound(player, 1.0f, 1.0f, "LEVEL_UP", "ENTITY_PLAYER_LEVELUP");
     }
 
@@ -354,23 +384,28 @@ public final class Gui {
 
     public static void changeItems(final @NotNull Player player) {
         final String name_map = mapPlayer.get(player);
-        if (DynamicTools.CHECKPOINTS_MAPS_ITEMS.get(name_map) .size() > 1) {
-            final int items = DynamicTools.CHECKPOINTS_MAPS_ITEMS.get(name_map).size() + 2;
+        final List<ItemStack> checkpointItems = DynamicTools.CHECKPOINTS_MAPS_ITEMS.get(name_map);
+
+        if (checkpointItems != null && checkpointItems.size() > 1) {
+            final int items = checkpointItems.size() + 2;
             final int slots = ((items + 8) / 9) * 9;
             final Map<Integer, ItemStack> mapItemOrder = new HashMap<>();
             final Inventory reorderInventory = Bukkit.createInventory(null, slots, order);
-            for (int i = 0; i <  DynamicTools.CHECKPOINTS_MAPS_ITEMS.get(name_map).size(); i++) {
-                reorderInventory.setItem(i, DynamicTools.CHECKPOINTS_MAPS_ITEMS.get(name_map).get(i));
-                mapItemOrder.put(i, DynamicTools.CHECKPOINTS_MAPS_ITEMS.get(name_map).get(i));
+
+            for (int i = 0; i < checkpointItems.size(); i++) {
+                reorderInventory.setItem(i, checkpointItems.get(i));
+                mapItemOrder.put(i, checkpointItems.get(i));
             }
+
             reorderInventory.setItem(slots - 2, new ItemStack(Tools.APPLY_CHANGES_ITEM.getItem()));
             mapItemOrder.put(slots - 2, Tools.APPLY_CHANGES_ITEM.getItem());
             reorderInventory.setItem(slots - 1, new ItemStack(Tools.CANCEL_CHANGES_ITEM.getItem()));
             mapItemOrder.put(slots - 1, Tools.CANCEL_CHANGES_ITEM.getItem());
+
             originalInventories.put(player, mapItemOrder);
             player.openInventory(reorderInventory);
             SoundApi.playSound(player, 1.0f, 1.0f, "CLICK", "UI_BUTTON_CLICK");
-        }else{
+        } else {
             SoundApi.playSound(player, 1.0f, 0.5f, "VILLAGER_IDLE", "ENTITY_VILLAGER_NO");
             player.sendMessage("Necesitas al menos 2 checkpoints si quieres ordenarlos");
         }

@@ -37,7 +37,7 @@ public final class Rules {
         }
     }
 
-    public @NotNull List<Location> getLocations() {
+    public @NotNull List<Location> getSpawnsLocations() {
         final List<Location> positions = new ArrayList<>();
         final ConfigurationSection spawnsSection = yamlConfiguration.getConfigurationSection("spawns");
         if (spawnsSection == null) return positions;
@@ -105,6 +105,25 @@ public final class Rules {
         }
         saveConfiguration();
     }
+
+
+    public boolean isEqualsLocation(final @NotNull Location location) {
+        final double adjustedX = (int) location.getX() + 0.5;
+        final double adjustedZ = (int) location.getZ() + 0.5;
+        final double y = location.getY();
+        final World world = location.getWorld();
+
+        for (Location end : getEndPoints()) {
+            if (end.getWorld().equals(world) &&
+                    end.getX() == adjustedX &&
+                    end.getY() == y &&
+                    end.getZ() == adjustedZ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void saveConfiguration() {
         try {
             configuration.saveConfiguration(yamlConfiguration, MAPS, MAP_FOLDER ,RULES);

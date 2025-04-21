@@ -119,6 +119,12 @@ public final class GuiListener implements Listener {
             if (item.isSimilar(Tools.OPEN_INVENTORY_ITEM.getItem()))
                 Gui.openInventoryOptions(player);
 
+            if (item.isSimilar(Tools.ONE_CHECKPOINT_MENU.getItem()))
+                Gui.loadOneCheckpointMap(player);
+
+            if (item.isSimilar(Tools.SPAWN_AND_FINISH_MENU.getItem()))
+                Gui.loadSpawnMenu(player);
+
             if (isCustomTool(item) || isBooleanTool(item) || isDynamicToolMaps(item) || isDynamicToolCheckpoints(item, nameMap) || isStateTool(item))event.setCancelled(true);
 
 
